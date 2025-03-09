@@ -1,5 +1,5 @@
 # Kali Linux in Docker with GUI
- 
+
 This repository contains a Dockerfile to build and run a Kali Linux container with a graphical user interface (GUI) accessible via Remote Desktop Protocol (RDP).
 
 ## Overview
@@ -58,24 +58,30 @@ Run the container with the following command to expose the RDP port:
 docker run -it -p 3389:3389 --name kali kali
 ```
 
+**Important:** Always use the `-p 3389:3389` flag when running the container to map the RDP port correctly. Without this port mapping, you won't be able to connect to the container using RDP.
+
+The container uses a startup script (`start-xrdp.sh`) that automatically:
+
+- Checks if the XRDP service is running
+- Starts the service if it's not running
+- Keeps the container running with `tail -f /dev/null`
+- Provides a bash shell for interaction
+
 Example output:
 
 ```
 Starting Remote Desktop Protocol server: xrdp-sesmanxrdp-sesman[23]: [INFO ] starting xrdp-sesman with pid 23
 
  xrdp.
+==================================================
+RDP server is running and ready for connections
+Connect to this container using RDP on port 3389
+Username: testuser
+Password: 1234
+==================================================
+
 ┌──(root㉿49a9aad56d46)-[/]
-└─# xrdp-sesman[23]: [INFO ] Socket 11: AF_INET6 connection received from ::1 port 33856
-
-xrdp-sesman[23]: [INFO ] Terminal Server Users group is disabled, allowing authentication
-
-xrdp-sesman[23]: [INFO ] ++ created session (access granted): username testuser, ip ::ffff:172.17.0.1:51780 - socket: 11
-
-xrdp-sesman[23]: [INFO ] starting Xorg session...
-
-xrdp-sesman[23]: [INFO ] Starting session: session_pid 37, display :10.0, width 1920, height 1080, bpp 24, client ip ::ffff:172.17.0.1:51780 - socket: 11, user name testuser
-
-xrdp-sesman[37]: [INFO ] [session start] (display 10): calling auth_start_session from pid 37
+└─#
 ```
 
 ## Connecting via RDP
@@ -95,6 +101,7 @@ xrdp-sesman[37]: [INFO ] [session start] (display 10): calling auth_start_sessio
   - Username: `testuser`
   - Password: `1234`
   - Has sudo privileges
+- Startup Script: Automatically manages XRDP service
 
 ## Customization Options
 
@@ -128,7 +135,33 @@ If you can't connect via RDP:
 
 - Ensure port 3389 is not blocked by a firewall
 - Check that the XRDP service is running in the container
+- Verify you used the `-p 3389:3389` flag when starting the container
 - Try restarting the container
+
+### Container Not Accessible via RDP
+
+If you've started the container but cannot connect via RDP:
+
+1. **Issue**: The container may be running but not properly exposing port 3389, or the container might exit prematurely.
+
+2. **Solution**:
+
+   - Always use the `-p 3389:3389` flag when running the container:
+     ```bash
+     docker run -it -p 3389:3389 --name kali-rdp kali
+     ```
+   - Use the included PowerShell script which handles this properly:
+     ```powershell
+     .\run-kali-container.ps1
+     ```
+   - Ensure the `start-xrdp.sh` script contains the `tail -f /dev/null` command to keep the container running
+
+3. **Verification**:
+   - Check if the container is running and exposing ports:
+     ```bash
+     docker ps
+     ```
+   - You should see an entry with `0.0.0.0:3389->3389/tcp` in the PORTS column
 
 ### Black Screen After Connection
 
@@ -140,11 +173,6 @@ If you see a black screen after connecting:
 ### Performance Issues
 
 For better performance:
-
-- Allocate more resources to Docker
-- Use a lower screen resolution in your RDP client settings
-
-## Notes
 
 - This container runs with root privileges by default
 - For security in production environments, consider modifying the setup to run with reduced privileges
