@@ -1,10 +1,5 @@
 #!/bin/bash
 
-<<<<<<< HEAD
-# Check if xrdp-sesman is running
-if pgrep xrdp-sesman > /dev/null; then
-  echo "xrdp-sesman is already running."
-=======
 # Configure XRDP 
 echo "Configuring XRDP..."
 cat > /etc/xrdp/xrdp.ini << EOF
@@ -128,14 +123,6 @@ sleep 1
 # Verify XRDP processes are running
 if ! pgrep xrdp > /dev/null; then
     echo "ERROR: XRDP failed to start!"
->>>>>>> 5d077112e2b7e19258d49a180feb05bd2f7eb03e
-else
-  # Remove the PID file if it exists
-  if [ -f /var/run/xrdp/xrdp-sesman.pid ]; then
-    rm /var/run/xrdp/xrdp-sesman.pid
-  fi
-  # Start the xrdp service
-  service xrdp start
 fi
 
 # Print connection information

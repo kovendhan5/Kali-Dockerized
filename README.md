@@ -15,7 +15,27 @@ This Docker setup provides:
 - Docker installed on your host system
 - RDP client (like Microsoft Remote Desktop)
 
-## Building the Docker Image
+## Using the Pre-built Image from GitHub Container Registry
+
+This Docker image is also available as a pre-built package on GitHub Container Registry.
+
+### Pulling the Image
+
+```bash
+# Pull the latest version
+docker pull ghcr.io/kovendhan5/kali-dockerized:latest
+
+# Or pull a specific version
+docker pull ghcr.io/kovendhan5/kali-dockerized:1.0.0
+```
+
+### Running the Pre-built Image
+
+```bash
+docker run -it -p 3389:3389 --name kali-rdp ghcr.io/kovendhan5/kali-dockerized:latest
+```
+
+## Building the Docker Image Locally
 
 To build the Kali Linux Docker image, run the following command in the repository directory:
 
@@ -126,6 +146,43 @@ RUN apt update && \
     apt install -y kali-tools-top10 && \
     adduser xrdp ssl-cert
 ```
+
+## Publishing to GitHub Container Registry
+
+This project uses GitHub Actions to automatically build and publish the Docker image to GitHub Container Registry.
+
+### Automated Publishing
+
+The Docker image is automatically built and published to GitHub Container Registry when:
+
+- Changes are pushed to the main/master branch
+- A new tag starting with 'v' is created (e.g., v1.0.0)
+- The workflow is manually triggered from the Actions tab
+
+The GitHub Actions workflow:
+
+1. Builds the Docker image
+2. Tags it with appropriate version tags
+3. Pushes it to GitHub Container Registry
+
+### Manual Setup Requirements
+
+To enable automated publishing, you need to:
+
+1. **Fork or push this repository to GitHub**
+2. **Enable GitHub Actions**: Go to your repository → Actions tab → Enable workflows
+3. **Set repository permissions**: Go to repository → Settings → Actions → General → Workflow permissions → Set to "Read and write permissions"
+
+The workflow will use the GitHub-provided `GITHUB_TOKEN`, so no manual token creation is required.
+
+### Available Image Tags
+
+The published image will be tagged with:
+
+- `latest` - the most recent build from the main branch
+- `v1.0.0` - specific version tags (when a tag is pushed)
+- `1.0` - major.minor tags (when a tag is pushed)
+- `sha-<commit>` - specific commit references
 
 ## Troubleshooting
 

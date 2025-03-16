@@ -21,8 +21,5 @@ EXPOSE 3389
 # Start XRDP service when container launches
 ENTRYPOINT ["/usr/local/bin/start-xrdp.sh"]
 
-
-
-
-CMD ["bash"]# Default command (will be passed as arguments to the entrypoint)# The following line is not needed since we use ENTRYPOINT
-# CMD ["bash"]
+# Default command (will be passed as arguments to the entrypoint)
+CMD ["bash"]
