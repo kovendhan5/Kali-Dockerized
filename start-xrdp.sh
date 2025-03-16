@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Configure XRDP
+# Configure XRDP 
 echo "Configuring XRDP..."
 cat > /etc/xrdp/xrdp.ini << EOF
 [Globals]
