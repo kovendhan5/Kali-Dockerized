@@ -1,149 +1,179 @@
-# Kali Linux Desktop in Docker with RDP Access
+# Kali Linux in Docker with GUI
 
-This project provides a Dockerized Kali Linux environment with a full XFCE desktop accessible via Remote Desktop Protocol (RDP).
+This repository contains a Dockerfile to build and run a Kali Linux container with a graphical user interface (GUI) accessible via Remote Desktop Protocol (RDP).
 
-## Features
+## Overview
+
+This Docker setup provides:
 
 - Kali Linux with XFCE desktop environment
-- Remote access via RDP (port 3389)
-- Persistent storage through Docker volume
-- Pre-configured test user with sudo privileges
-- Automatic XRDP configuration and startup
+- RDP access via port 3389
+- A preconfigured user account for easy access
 
 ## Prerequisites
 
 - Docker installed on your host system
-- Remote Desktop Client (e.g., Microsoft Remote Desktop)
+- RDP client (like Microsoft Remote Desktop)
 
-## Quick Start
+## Building the Docker Image
 
-### Build the Docker Image
-
-```bash
-docker build -t kali-desktop .
-```
-
-### Run the Container
+To build the Kali Linux Docker image, run the following command in the repository directory:
 
 ```bash
-docker run -d --name kali-desktop -p 3389:3389 -v kali-data:/kali-data kali-desktop
+docker build -t kali .
 ```
 
-For better performance on some systems, you can try host networking:
+Example build output:
+
+```
+[+] Building 495.0s (8/8) FINISHED                                                                                                                                  docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                                                                                0.1s
+ => => transferring dockerfile: 504B                                                                                                                                                0.0s
+ => [internal] load metadata for docker.io/kalilinux/kali-rolling:latest                                                                                                            5.2s
+ => [auth] kalilinux/kali-rolling:pull token for registry-1.docker.io                                                                                                               0.0s
+ => [internal] load .dockerignore                                                                                                                                                   0.0s
+ => => transferring context: 2B                                                                                                                                                     0.0s
+ => [1/3] FROM docker.io/kalilinux/kali-rolling:latest@sha256:d08bebbd0f69def3ab4eec63c01e9fa3e17b28cd634faec4ade6540a46ecfddc                                                     13.6s
+ => => resolve docker.io/kalilinux/kali-rolling:latest@sha256:d08bebbd0f69def3ab4eec63c01e9fa3e17b28cd634faec4ade6540a46ecfddc                                                      0.0s
+ => => sha256:70a02e78eadb74819f2804aade60ec9286eb658a7a9a889a2f20e0d552177cc7 52.87MB / 52.87MB                                                                                    7.1s
+ => => sha256:d08bebbd0f69def3ab4eec63c01e9fa3e17b28cd634faec4ade6540a46ecfddc 1.19kB / 1.19kB                                                                                      0.0s
+ => => sha256:9820ddd2c0bbd2a5e01258cd9a7214bc9dd5f44465a002830dd316298f24b7db 429B / 429B                                                                                          0.0s
+ => => sha256:117a912df1aaa1f0fd20d85b814518e30c71cec5952fcbe15e4fe17c2291569a 2.87kB / 2.87kB                                                                                      0.0s
+ => => extracting sha256:70a02e78eadb74819f2804aade60ec9286eb658a7a9a889a2f20e0d552177cc7                                                                                           6.0s
+ => [2/3] RUN apt update &&     DEBIAN_FRONTEND=noninteractive apt install -y kali-desktop-xfce &&     apt install -y xrdp &&     adduser xrdp ssl-cert                           442.8s
+ => [3/3] RUN useradd -m testuser &&     echo "testuser:1234" | chpasswd &&     usermod -aG sudo testuser                                                                           0.8s
+ => exporting to image                                                                                                                                                             32.2s
+ => => exporting layers                                                                                                                                                            32.1s
+ => => writing image sha256:144fa2597ff7162cb1a90c4f10ccf034738fd8aafb3208d6faf4f355375a495f                                                                                        0.0s
+ => => naming to docker.io/library/kali                                                                                                                                             0.0s
+```
+
+Note: The build process may take a while (8+ minutes) as it needs to install the XFCE desktop environment and RDP server.
+
+## Running the Container
+
+Run the container with the following command to expose the RDP port:
 
 ```bash
-docker run -d --name kali-desktop --network host -v kali-data:/kali-data kali-desktop
+docker run -it -p 3389:3389 --name kali kali
 ```
 
-### Connect to the Container
+**Important:** Always use the `-p 3389:3389` flag when running the container to map the RDP port correctly. Without this port mapping, you won't be able to connect to the container using RDP.
 
-1. Open your Remote Desktop client
-2. Connect to `localhost:3389` or your Docker host IP on port 3389
-3. Login credentials:
+The container uses a startup script (`start-xrdp.sh`) that automatically:
+
+- Checks if the XRDP service is running
+- Starts the service if it's not running
+- Keeps the container running with `tail -f /dev/null`
+- Provides a bash shell for interaction
+
+Example output:
+
+```
+Starting Remote Desktop Protocol server: xrdp-sesmanxrdp-sesman[23]: [INFO ] starting xrdp-sesman with pid 23
+
+ xrdp.
+==================================================
+RDP server is running and ready for connections
+Connect to this container using RDP on port 3389
+Username: testuser
+Password: 1234
+==================================================
+
+┌──(root㉿49a9aad56d46)-[/]
+└─#
+```
+
+## Connecting via RDP
+
+1. Open your RDP client (such as Microsoft Remote Desktop)
+2. Connect to `localhost:3389` or your host machine's IP address on port 3389
+3. Use the following credentials:
    - Username: `testuser`
    - Password: `1234`
 
-## Remote Desktop Connection Tips
+## Container Details
 
-### For Windows 11/10 Users
+- Base Image: `kalilinux/kali-rolling:latest`
+- Desktop Environment: XFCE
+- Remote Access: XRDP on port 3389
+- Default User:
+  - Username: `testuser`
+  - Password: `1234`
+  - Has sudo privileges
+- Startup Script: Automatically manages XRDP service
 
-If you're experiencing connection issues with the Remote Desktop client:
+## Customization Options
 
-1. In Remote Desktop Connection, click "Show Options"
-2. Go to the "Experience" tab
-3. Reduce the connection speed to "LAN (10 Mbps or higher)"
-4. Uncheck all visual features except "Persistent bitmap caching"
-5. In "Advanced" > "Settings", select "RDP" as the security protocol
+### Changing the User Password
 
-## Persistent Storage
-
-All data stored in the `/kali-data` directory inside the container will persist across container restarts and removals. This is managed through a Docker volume named `kali-data`.
-
-## Container Management
-
-### Stop the Container
-
-```bash
-docker stop kali-desktop
-```
-
-### Start an Existing Container
-
-```bash
-docker start kali-desktop
-```
-
-### Remove the Container
-
-```bash
-docker rm -f kali-desktop
-```
-
-### View Container Logs
-
-```bash
-docker logs kali-desktop
-```
-
-## Customization
-
-### Change Default User Credentials
-
-Edit the Dockerfile and modify the following lines:
+If you want to use a different password, modify the following line in the Dockerfile:
 
 ```dockerfile
-RUN useradd -m testuser && \
-    echo "testuser:1234" | chpasswd && \
-    usermod -aG sudo testuser
+echo "testuser:1234" | chpasswd
 ```
 
-### Add Additional Software
+### Installing Additional Tools
 
-Edit the Dockerfile to install additional packages. For example:
+You can install additional Kali tools by adding more `apt install` commands to the Dockerfile.
+
+Example:
 
 ```dockerfile
 RUN apt update && \
-    apt install -y metasploit-framework nmap wireshark
+    DEBIAN_FRONTEND=noninteractive apt install -y kali-desktop-xfce && \
+    apt install -y xrdp && \
+    apt install -y kali-tools-top10 && \
+    adduser xrdp ssl-cert
 ```
 
 ## Troubleshooting
 
-### XRDP Connection Issues
+### RDP Connection Issues
 
-If you cannot connect:
+If you can't connect via RDP:
 
-1. Check container logs: `docker logs kali-desktop`
-2. Verify that port 3389 is listening inside the container:
-   ```bash
-   docker exec kali-desktop netstat -tln | grep 3389
-   ```
-3. Test if the port is accessible from the host:
-   ```bash
-   telnet localhost 3389
-   ```
-4. Check if the port forwarding is correctly configured:
-   ```bash
-   docker port kali-desktop
-   ```
+- Ensure port 3389 is not blocked by a firewall
+- Check that the XRDP service is running in the container
+- Verify you used the `-p 3389:3389` flag when starting the container
+- Try restarting the container
 
-### Container Crashes
+### Container Not Accessible via RDP
 
-If the container crashes or exits unexpectedly, try running it with added debug information:
+If you've started the container but cannot connect via RDP:
 
-```bash
-docker run -it --name kali-desktop -p 3389:3389 kali-desktop bash
-```
+1. **Issue**: The container may be running but not properly exposing port 3389, or the container might exit prematurely.
 
-This will let you run the container and start the script manually to observe any error messages.
+2. **Solution**:
 
-## Security Considerations
+   - Always use the `-p 3389:3389` flag when running the container:
+     ```bash
+     docker run -it -p 3389:3389 --name kali-rdp kali
+     ```
+   - Use the included PowerShell script which handles this properly:
+     ```powershell
+     .\run-kali-container.ps1
+     ```
+   - Ensure the `start-xrdp.sh` script contains the `tail -f /dev/null` command to keep the container running
 
-This container is designed for development and testing purposes. Note the following security considerations:
+3. **Verification**:
+   - Check if the container is running and exposing ports:
+     ```bash
+     docker ps
+     ```
+   - You should see an entry with `0.0.0.0:3389->3389/tcp` in the PORTS column
 
-- Default credentials are simple and should be changed for production use
-- RDP traffic is not end-to-end encrypted by default
-- The container runs with a sudo-capable user
+### Black Screen After Connection
 
-## License
+If you see a black screen after connecting:
 
-This project is open-source and available under the MIT License.
+- The XFCE session might not have started correctly
+- Try restarting the container and reconnecting
+
+### Performance Issues
+
+For better performance:
+
+- This container runs with root privileges by default
+- For security in production environments, consider modifying the setup to run with reduced privileges
+- The container does not persist data by default; use Docker volumes if you need to save your work
