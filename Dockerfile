@@ -34,15 +34,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create a user (check if kali user exists, if not create testuser)
-RUN if id "kali" &>/dev/null; then \
-        echo "kali:1234" | chpasswd && \
-        usermod -aG sudo kali; \
-    else \
-        useradd -m testuser && \
-        echo "testuser:1234" | chpasswd && \
-        usermod -aG sudo testuser; \
-    fi
+# Create a user for RDP access
+RUN useradd -m testuser && \
+    echo "testuser:1234" | chpasswd && \
+    usermod -aG sudo testuser
 
 # Copy the XRDP startup script and make it executable
 COPY start-xrdp.sh /usr/local/bin/

@@ -24,6 +24,30 @@ This Docker setup provides:
 - Enhanced stability and error handling
 - **Persistent storage for user data and customizations**
 
+## Docker Hub Publishing Notes
+
+### Large Image Size Considerations
+
+The Kali Linux Docker images are quite large due to the included packages and desktop environment:
+- Full image: ~2.5-3GB
+- Minimal image: ~1-1.5GB
+
+When pushing to Docker Hub, you might encounter timeout issues or interrupted uploads due to the large size. If this happens:
+
+1. Use the provided `push-large-images.bat` script which includes retry logic
+2. Try pushing the minimal image first using `push-minimal-image.bat`
+3. For manual retries, use this command:
+   ```bash
+   docker push YOUR_USERNAME/kali-dockerized:TAG --disable-content-trust
+   ```
+4. Make sure you have a stable internet connection before pushing
+
+### Docker Hub Command Options
+
+For large images, using these Docker command options can help:
+- `--disable-content-trust`: Can help with large image uploads
+- Consider breaking large uploads into smaller layers in your Dockerfile
+
 ## Data Persistence
 
 All user data is automatically preserved between container restarts using Docker volumes:

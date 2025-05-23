@@ -38,6 +38,9 @@
 - Added `build-push-dockerhub.sh` - Bash script for Linux/macOS users
 - Added `build-push-dockerhub.ps1` - PowerShell script for Windows users
 - Added `build-push-dockerhub.bat` - Simplified batch wrapper for Windows
+- Added `push-large-images.bat` - Special script for handling large image uploads
+- Added `push-minimal-image.bat` - Script focused on pushing just the minimal image
+- Enhanced retry logic for dealing with large Docker image uploads
 - Documented Docker Hub publishing process in README.md
 - Added configuration options for username, version tags, and image variants
 
