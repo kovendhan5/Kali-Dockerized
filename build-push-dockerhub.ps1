@@ -6,6 +6,8 @@ $DOCKER_HUB_USERNAME = "kovendhan5"  # Your Docker Hub username
 $IMAGE_NAME = "kali-dockerized"
 $IMAGE_VERSION = "latest"
 $BUILD_MINIMAL = $true    # Set to $true to also build the minimal version
+$PUSH_OPTIMIZED = $true   # Set to $true to push optimized images
+$PUSH_ULTRASLIM = $true   # Set to $true to push ultra-slim image
 
 # Check if Docker is installed
 try {
@@ -147,17 +149,68 @@ function Push-ImageWithRetry {
     return $true
 }
 
+function Push-OptimizedImages {
+    Write-Host "`nPushing optimized images to Docker Hub..." -ForegroundColor Yellow
+    
+    $ultraSlimExists = $false
+    $minimalOptExists = $false
+    
+    # Check if optimized images exist
+    $images = docker images "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}" --format "{{.Repository}}:{{.Tag}}"
+    
+    if ($images -contains "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:ultraslim") {
+        $ultraSlimExists = $true
+        Write-Host "Found ultra-slim image" -ForegroundColor Green
+    }
+    
+    if ($images -contains "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:minimal-optimized") {
+        $minimalOptExists = $true
+        Write-Host "Found minimal-optimized image" -ForegroundColor Green
+    }
+    
+    # Push the ultra-slim image (smallest)
+    if ($ultraSlimExists -and $PUSH_ULTRASLIM) {
+        Write-Host "Pushing ultra-slim image: ${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:ultraslim" -ForegroundColor Cyan
+        docker push "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:ultraslim"
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Ultra-slim image pushed successfully!" -ForegroundColor Green
+        } else {
+            Write-Host "Failed to push ultra-slim image." -ForegroundColor Red
+        }
+    }
+    
+    # Push the minimal-optimized image
+    if ($minimalOptExists -and $PUSH_OPTIMIZED) {
+        Write-Host "Pushing minimal-optimized image: ${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:minimal-optimized" -ForegroundColor Cyan
+        docker push "${DOCKER_HUB_USERNAME}/${IMAGE_NAME}:minimal-optimized"
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Minimal-optimized image pushed successfully!" -ForegroundColor Green
+        } else {
+            Write-Host "Failed to push minimal-optimized image." -ForegroundColor Red
+        }
+    }
+}
+
 # Main execution flow
 Show-Header
 Check-DockerHubLogin
 Get-DockerHubUsername
-Build-MainImage
 
-if ($BUILD_MINIMAL) {
-    Build-MinimalImage
+# If you've already built the optimized images, just push them
+if ($PUSH_OPTIMIZED -or $PUSH_ULTRASLIM) {
+    Push-OptimizedImages
+} else {
+    # Original build and push logic
+    Build-MainImage
+    
+    if ($BUILD_MINIMAL) {
+        Build-MinimalImage
+    }
+    
+    Push-Images
 }
-
-Push-Images
 
 Write-Host "`nAll done! Your images are now available on Docker Hub:" -ForegroundColor Green
 Write-Host "https://hub.docker.com/r/${DOCKER_HUB_USERNAME}/${IMAGE_NAME}" -ForegroundColor Cyan
