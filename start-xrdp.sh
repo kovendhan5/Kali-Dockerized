@@ -83,46 +83,61 @@ chmod 755 /etc/xrdp/startwm.sh
 mkdir -p /var/run/xrdp
 mkdir -p /var/run/dbus
 
-# Fix the D-Bus issue - check for stale pid file
-if [ -f "/run/dbus/pid" ]; then
-    echo "Removing stale D-Bus pid file"
-    rm -f /run/dbus/pid
-fi
+# Clean up any existing processes and files
+echo "Cleaning up existing processes and PID files..."
 
-# Remove stale xrdp pid files
-if [ -f "/var/run/xrdp/xrdp-sesman.pid" ]; then
-    echo "Removing stale xrdp-sesman pid file"
-    rm -f /var/run/xrdp/xrdp-sesman.pid
-fi
+# Kill any existing processes
+pkill -9 xrdp 2>/dev/null || true
+pkill -9 xrdp-sesman 2>/dev/null || true
+pkill -9 dbus-daemon 2>/dev/null || true
+sleep 2
 
-if [ -f "/var/run/xrdp/xrdp.pid" ]; then
-    echo "Removing stale xrdp pid file"
-    rm -f /var/run/xrdp/xrdp.pid
-fi
+# Remove all stale PID files
+rm -f /run/dbus/pid 2>/dev/null || true
+rm -f /var/run/dbus/pid 2>/dev/null || true
+rm -f /var/run/xrdp/xrdp-sesman.pid 2>/dev/null || true
+rm -f /var/run/xrdp/xrdp.pid 2>/dev/null || true
+
+# Clean up socket files
+rm -f /var/run/xrdp/xrdp_listen.sock 2>/dev/null || true
+rm -f /var/run/xrdp/xrdp_api.sock 2>/dev/null || true
 
 # Initialize D-Bus
 echo "Starting D-Bus..."
 mkdir -p /var/run/dbus
 chown messagebus:messagebus /var/run/dbus
-dbus-daemon --system
-
-# Kill any existing xrdp processes
-pkill -9 xrdp 2>/dev/null || true
-pkill -9 xrdp-sesman 2>/dev/null || true
+dbus-daemon --system --fork
 sleep 1
 
 # Start XRDP session manager
-echo "Starting XRDP components..."
-/usr/sbin/xrdp-sesman --daemon
-sleep 2
+echo "Starting XRDP session manager..."
+if /usr/sbin/xrdp-sesman; then
+    echo "XRDP session manager started successfully"
+    sleep 2
+else
+    echo "Failed to start XRDP session manager"
+    exit 1
+fi
 
 # Start XRDP server
-/usr/sbin/xrdp --daemon
-sleep 1
+echo "Starting XRDP server..."
+if /usr/sbin/xrdp; then
+    echo "XRDP server started successfully"
+    sleep 1
+else
+    echo "Failed to start XRDP server"
+    exit 1
+fi
 
 # Verify XRDP processes are running
+if ! pgrep xrdp-sesman > /dev/null; then
+    echo "ERROR: XRDP session manager failed to start!"
+    exit 1
+fi
+
 if ! pgrep xrdp > /dev/null; then
-    echo "ERROR: XRDP failed to start!"
+    echo "ERROR: XRDP server failed to start!"
+    exit 1
 fi
 
 # Print connection information
@@ -130,10 +145,37 @@ echo ""
 echo "=================================================="
 echo "RDP server is running and ready for connections"
 echo "Connect to this container using RDP on port 3389"
-echo "Username: testuser"
+if id "kali" &>/dev/null; then
+    echo "Username: kali"
+else
+    echo "Username: testuser"
+fi
 echo "Password: 1234"
+echo ""
+echo "Active processes:"
+ps aux | grep -E "(xrdp|dbus)" | grep -v grep
 echo "=================================================="
 echo ""
+
+# Function to monitor services
+monitor_services() {
+    while true; do
+        if ! pgrep xrdp-sesman > /dev/null; then
+            echo "WARNING: XRDP session manager stopped, restarting..."
+            /usr/sbin/xrdp-sesman
+        fi
+        
+        if ! pgrep xrdp > /dev/null; then
+            echo "WARNING: XRDP server stopped, restarting..."
+            /usr/sbin/xrdp
+        fi
+        
+        sleep 30
+    done
+}
+
+# Start monitoring in background
+monitor_services &
 
 # Keep the container running
 tail -f /dev/null
