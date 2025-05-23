@@ -1,13 +1,29 @@
 @echo off
-REM Simple batch script to run Kali Docker container
+REM Enhanced batch script to run Kali Docker container with fallback
 
 echo Building Kali Linux Docker image...
+echo Attempting build with primary Dockerfile...
 docker build -t kali . --no-cache
 
 if %errorlevel% neq 0 (
-    echo Failed to build Docker image!
-    pause
-    exit /b 1
+    echo Primary build failed! Trying alternative Dockerfile...
+    if exist "Dockerfile.alternative" (
+        docker build -t kali . -f Dockerfile.alternative --no-cache
+        if %errorlevel% neq 0 (
+            echo Both build attempts failed!
+            echo This might be due to network issues or repository problems.
+            echo Try again later or check your internet connection.
+            pause
+            exit /b 1
+        )
+        echo Alternative build succeeded!
+    ) else (
+        echo No alternative Dockerfile found!
+        pause
+        exit /b 1
+    )
+) else (
+    echo Primary build succeeded!
 )
 
 echo Stopping any existing container...

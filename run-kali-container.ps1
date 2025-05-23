@@ -21,12 +21,30 @@ function Show-Usage {
 
 function Build-Image {
     Write-Host "Building Kali Linux Docker image..." -ForegroundColor Green
+    Write-Host "Attempting build with primary Dockerfile..." -ForegroundColor Cyan
+    
     docker build -t kali . --no-cache
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Image built successfully!" -ForegroundColor Green
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Primary build failed! Trying alternative Dockerfile..." -ForegroundColor Yellow
+        
+        if (Test-Path "Dockerfile.alternative") {
+            docker build -t kali . -f Dockerfile.alternative --no-cache
+            
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "Alternative build succeeded!" -ForegroundColor Green
+            } else {
+                Write-Host "Both build attempts failed!" -ForegroundColor Red
+                Write-Host "This might be due to network issues or repository problems." -ForegroundColor Yellow
+                Write-Host "Try again later or check your internet connection." -ForegroundColor Yellow
+                exit 1
+            }
+        } else {
+            Write-Host "No alternative Dockerfile found!" -ForegroundColor Red
+            exit 1
+        }
     } else {
-        Write-Host "Failed to build image!" -ForegroundColor Red
-        exit 1
+        Write-Host "Primary build succeeded!" -ForegroundColor Green
     }
 }
 

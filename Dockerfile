@@ -1,14 +1,22 @@
 FROM kalilinux/kali-rolling:latest
 
+# Fix GPG key issues and update package lists
+RUN apt-get update --allow-insecure-repositories || \
+    (echo "Initial update failed, trying alternative approach..." && \
+     apt-get update --allow-releaseinfo-change --allow-insecure-repositories) && \
+    apt-get install -y --allow-unauthenticated kali-archive-keyring && \
+    apt-get update
+
 # Install XFCE desktop environment and XRDP
-RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
         kali-desktop-xfce \
         xrdp \
         dbus-x11 \
         supervisor \
-        sudo && \
-    apt clean && \
+        sudo \
+        wget \
+        curl && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     adduser xrdp ssl-cert
 
