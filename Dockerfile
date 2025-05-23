@@ -1,11 +1,8 @@
 FROM kalilinux/kali-rolling:latest
 
-# Fix GPG key issues and update package lists
-RUN apt-get update --allow-insecure-repositories || \
-    (echo "Initial update failed, trying alternative approach..." && \
-     apt-get update --allow-releaseinfo-change --allow-insecure-repositories) && \
-    apt-get install -y --allow-unauthenticated kali-archive-keyring && \
-    apt-get update
+# Fix GPG key issues using dedicated script
+COPY fix-gpg-keys.sh /tmp/
+RUN chmod +x /tmp/fix-gpg-keys.sh && /tmp/fix-gpg-keys.sh
 
 # Install XFCE desktop environment and XRDP
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -21,7 +18,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     adduser xrdp ssl-cert
 
 # Create a user (check if kali user exists, if not create testuser)
-RUN if id "kali" 2>/dev/null; then \
+RUN if id "kali" &>/dev/null; then \
         echo "kali:1234" | chpasswd && \
         usermod -aG sudo kali; \
     else \

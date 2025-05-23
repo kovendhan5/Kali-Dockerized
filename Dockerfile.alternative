@@ -1,63 +1,39 @@
 FROM kalilinux/kali-rolling:latest
 
-# Set environment variables to avoid interactive prompts
-ENV DEBIAN_FRONTEND=noninteractive
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
+# Alternative approach for GPG key issues
+RUN apt-get update --allow-insecure-repositories || true && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --allow-unauthenticated \
+    ca-certificates \
+    gnupg \
+    wget && \
+    wget -q -O - https://archive.kali.org/archive-key.asc | apt-key add - && \
+    apt-get update || true
 
-# Fix repository and GPG issues
-RUN echo "Acquire::Check-Valid-Until \"false\";" > /etc/apt/apt.conf.d/100disablechecks && \
-    echo "Acquire::AllowInsecureRepositories \"true\";" >> /etc/apt/apt.conf.d/100disablechecks && \
-    echo "Acquire::AllowDowngradeToInsecureRepositories \"true\";" >> /etc/apt/apt.conf.d/100disablechecks
-
-# Update and install basic packages first
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get update --allow-insecure-repositories --allow-releaseinfo-change || true
-
-# Install kali-archive-keyring to fix GPG issues
-RUN apt-get install -y --allow-unauthenticated --no-install-recommends \
-        kali-archive-keyring \
-        apt-transport-https \
-        ca-certificates \
-        gnupg && \
-    apt-get update
-
-# Install desktop environment and RDP components
-RUN apt-get install -y --no-install-recommends \
-        kali-desktop-xfce \
-        xrdp \
-        dbus-x11 \
-        supervisor \
-        sudo \
-        wget \
-        curl \
-        nano \
-        net-tools && \
+# Install minimal desktop environment and XRDP
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --allow-unauthenticated \
+    xfce4 \
+    xfce4-terminal \
+    xrdp \
+    dbus-x11 \
+    sudo && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    adduser xrdp ssl-cert || true
 
-# Configure XRDP
-RUN adduser xrdp ssl-cert
-
-# Create a user (check if kali user exists, if not create testuser)
-RUN if id "kali" 2>/dev/null; then \
-        echo "kali:1234" | chpasswd && \
-        usermod -aG sudo kali; \
-    else \
-        useradd -m testuser && \
-        echo "testuser:1234" | chpasswd && \
-        usermod -aG sudo testuser; \
-    fi
+# Ensure we have a user account
+RUN if ! id kali >/dev/null 2>&1; then \
+        useradd -m -s /bin/bash kali; \
+    fi && \
+    echo "kali:1234" | chpasswd && \
+    usermod -aG sudo kali || true
 
 # Copy the XRDP startup script and make it executable
 COPY start-xrdp.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/start-xrdp.sh
 
-# Configure system for better RDP performance
-RUN echo "session optional pam_systemd.so" >> /etc/pam.d/xrdp-sesman && \
-    mkdir -p /var/run/dbus && \
-    mkdir -p /var/run/xrdp && \
-    chown messagebus:messagebus /var/run/dbus
+# Configure XRDP
+RUN mkdir -p /var/run/dbus && \
+    mkdir -p /var/run/xrdp
 
 # Expose RDP port
 EXPOSE 3389

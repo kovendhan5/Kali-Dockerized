@@ -198,14 +198,34 @@ The published image will be tagged with:
 
 ## Troubleshooting
 
-### RDP Connection Issues
+### GPG Key Issues
 
-If you can't connect via RDP:
+If you encounter GPG key verification errors during the Docker build process, the scripts have been updated to handle this automatically. They will:
 
-- Ensure port 3389 is not blocked by a firewall
-- Check that the XRDP service is running in the container
-- Verify you used the `-p 3389:3389` flag when starting the container
-- Try restarting the container
+1. Try different methods to import the Kali Linux GPG keys
+2. Use `--allow-insecure-repositories` and `--allow-unauthenticated` as fallbacks
+3. Try an alternative Dockerfile if the main one fails
+
+If you still encounter issues, you can manually fix them by running:
+
+```bash
+docker run --rm -it kalilinux/kali-rolling:latest bash
+```
+
+Then within that container:
+
+```bash
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 827C8569F2518CC677FECA1AED65462EC8D5E4C5
+apt update
+```
+
+### XRDP Connection Issues
+
+If you have trouble connecting to the container via RDP:
+
+1. Ensure port 3389 is not being used by another service on your host
+2. Try restarting the container: `docker restart kali-rdp`
+3. Check the logs: `docker logs kali-rdp`
 
 ### Container Not Accessible via RDP
 
