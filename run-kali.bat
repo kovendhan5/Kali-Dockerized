@@ -121,9 +121,27 @@ if %errorlevel% neq 0 (
     GOTO ACTION_build
 )
 
-echo Stopping any existing container...
-docker stop %CONTAINER_NAME% >nul 2>&1
-docker rm %CONTAINER_NAME% >nul 2>&1
+echo Checking for existing container...
+docker ps -a | findstr %CONTAINER_NAME% > nul
+if %errorlevel% equ 0 (
+    echo.
+    echo Found existing %CONTAINER_NAME% container.
+    echo Stopping it for restart...
+    docker stop %CONTAINER_NAME% >nul 2>&1
+    
+    echo.
+    set /p DELETE_CONTAINER="Do you want to recreate the container (data will be lost)? (y/n) [n]: "
+    if /i "!DELETE_CONTAINER!"=="y" (
+        echo Removing existing container...
+        docker rm %CONTAINER_NAME% >nul 2>&1
+        set CONTAINER_EXISTS=0
+    ) else (
+        echo Keeping existing container (will be restarted)...
+        set CONTAINER_EXISTS=1
+    )
+) else (
+    set CONTAINER_EXISTS=0
+)
 
 REM Check for port conflicts
 netstat -an | findstr "0.0.0.0:%PORT%" > nul
@@ -143,12 +161,24 @@ if %errorlevel% equ 0 (
     exit /b 1
 )
 
-echo Starting Kali Linux container...
-echo Container will be available on RDP port %PORT%
-echo Default credentials: kali/testuser : 1234
 echo.
+echo Starting Kali Linux container...
 
-docker run -d -p %PORT%:3389 --name %CONTAINER_NAME% %IMAGE_NAME%
+if "!CONTAINER_EXISTS!"=="1" (
+    echo Restarting existing container with previous data...
+    docker start %CONTAINER_NAME%
+) else (
+    echo Creating new container...
+    echo Creating persistent data volume for user home directory...
+    docker volume create %CONTAINER_NAME%_home > nul
+    
+    echo Container will be available on RDP port %PORT%
+    echo Default credentials: kali/testuser : 1234
+    echo User data will be preserved in Docker volume: %CONTAINER_NAME%_home
+    echo.
+    
+    docker run -d -p %PORT%:3389 -v %CONTAINER_NAME%_home:/home --name %CONTAINER_NAME% %IMAGE_NAME%
+)
 
 if %errorlevel% eq 0 (
     echo Container started successfully!

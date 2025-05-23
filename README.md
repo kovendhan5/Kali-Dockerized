@@ -11,6 +11,7 @@ This repository contains a Dockerfile to build and run a Kali Linux container wi
 - Better error handling and logging
 - Support for both `kali` and `testuser` accounts
 - Added health checks and service monitoring
+- **NEW: Data persistence across container restarts**
 
 ## Overview
 
@@ -21,6 +22,17 @@ This Docker setup provides:
 - A preconfigured user account for easy access
 - Automatic service recovery and monitoring
 - Enhanced stability and error handling
+- **Persistent storage for user data and customizations**
+
+## Data Persistence
+
+All user data is automatically preserved between container restarts using Docker volumes:
+
+- User files and customizations are stored in a Docker volume
+- Container restarts maintain all your data and settings
+- No need for manual backups between sessions
+
+For more details, see [DATA_PERSISTENCE.md](DATA_PERSISTENCE.md).
 
 ## Prerequisites
 

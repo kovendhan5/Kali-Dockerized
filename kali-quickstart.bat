@@ -22,13 +22,22 @@ if %errorlevel% equ 0 (
     docker ps | findstr kali-rdp > nul
     if %errorlevel% equ 0 (
         echo Container is already running
+        
+        echo.
+        echo ============================================================
+        echo Your existing container is running with all your saved data.
+        echo Any files or customizations you made are still available.
+        echo ============================================================
+        echo.
     ) else (
-        echo Starting container...
+        echo Starting container with your saved data and customizations...
         docker start kali-rdp
         
         if !errorlevel! neq 0 (
             echo Failed to start existing container. It might be corrupted.
             echo Would you like to recreate it?
+            echo WARNING: Recreating the container will lose any saved files
+            echo         or customizations made inside the container.
             set /p recreate="Recreate container? (y/n): "
             
             if "!recreate!"=="y" (
@@ -40,12 +49,22 @@ if %errorlevel% equ 0 (
                 pause
                 exit /b 1
             )
+        ) else (
+            echo.
+            echo ============================================================
+            echo Container successfully restarted with your previous data.
+            echo All customizations and files have been preserved.
+            echo ============================================================
+            echo.
         )
     )
 ) else (
     :CREATE_NEW
     echo No existing container found.
-    echo Creating new container...
+    echo Creating new persistent container...
+    echo.
+    echo NOTE: Any changes you make inside the container will be 
+    echo       automatically saved for future sessions.
     echo.
     echo Choose container type:
     echo  1. Full Kali with all tools

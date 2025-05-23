@@ -71,27 +71,44 @@ function Build-Image {
 function Start-Container {
     # Check if container already exists
     $existingContainer = docker ps -a --filter "name=$ContainerName" --format "{{.Names}}"
+    $containerExists = $false
     
     if ($existingContainer) {
-        Write-Host "Container $ContainerName already exists. Stopping and removing..." -ForegroundColor Yellow
-        docker stop $ContainerName 2>$null
-        docker rm $ContainerName 2>$null
+        Write-Host "Container $ContainerName already exists." -ForegroundColor Yellow
+        $deleteContainer = Read-Host "Do you want to recreate the container (data will be lost)? (y/n) [n]"
+        
+        if ($deleteContainer -eq "y" -or $deleteContainer -eq "Y") {
+            Write-Host "Stopping and removing existing container..." -ForegroundColor Yellow
+            docker stop $ContainerName 2>$null
+            docker rm $ContainerName 2>$null
+        } else {
+            Write-Host "Restarting existing container with previous data..." -ForegroundColor Green
+            docker start $ContainerName 2>$null
+            $containerExists = $true
+        }
     }
     
-    Write-Host "Starting Kali Linux container..." -ForegroundColor Green
-    Write-Host "Container will be available on RDP port $Port" -ForegroundColor Cyan
-    Write-Host "Default credentials: kali/testuser : 1234" -ForegroundColor Cyan
-    
-    # Check if we want to mount the current directory
-    $volumeMount = ""
-    $volumePrompt = Read-Host "Do you want to mount the current directory into the container? (y/n)"
-    if ($volumePrompt -eq "y" -or $volumePrompt -eq "Y") {
-        $currentDir = (Get-Location).Path
-        $volumeMount = "-v ${currentDir}:/shared"
-        Write-Host "Mounting $currentDir to /shared in the container" -ForegroundColor Cyan
+    if (-not $containerExists) {
+        Write-Host "Starting Kali Linux container..." -ForegroundColor Green
+        Write-Host "Container will be available on RDP port $Port" -ForegroundColor Cyan
+        Write-Host "Default credentials: kali/testuser : 1234" -ForegroundColor Cyan
+        
+        # Create persistent volume for user data
+        Write-Host "Creating persistent data volume for user home directory..." -ForegroundColor Cyan
+        docker volume create "${ContainerName}_home" | Out-Null
+        
+        # Check if we want to mount the current directory
+        $volumeMount = "-v ${ContainerName}_home:/home"
+        $mountPrompt = Read-Host "Do you want to mount the current directory into the container? (y/n)"
+        if ($mountPrompt -eq "y" -or $mountPrompt -eq "Y") {
+            $currentDir = (Get-Location).Path
+            $volumeMount = "$volumeMount -v ${currentDir}:/shared"
+            Write-Host "Mounting $currentDir to /shared in the container" -ForegroundColor Cyan
+        }
+        
+        Write-Host "User data will be preserved in Docker volume: ${ContainerName}_home" -ForegroundColor Cyan
+        Invoke-Expression "docker run -d -p ${Port}:3389 $volumeMount --name $ContainerName kali"
     }
-    
-    Invoke-Expression "docker run -d -p ${Port}:3389 $volumeMount --name $ContainerName kali"
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Container started successfully!" -ForegroundColor Green
