@@ -21,7 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     adduser xrdp ssl-cert
 
 # Create a user (check if kali user exists, if not create testuser)
-RUN if id "kali" &>/dev/null; then \
+RUN if id "kali" 2>/dev/null; then \
         echo "kali:1234" | chpasswd && \
         usermod -aG sudo kali; \
     else \
