@@ -208,6 +208,56 @@ The published image will be tagged with:
 - `1.0` - major.minor tags (when a tag is pushed)
 - `sha-<commit>` - specific commit references
 
+## Publishing to Docker Hub
+
+You can publish this image to your Docker Hub account using the provided scripts:
+
+### Windows Users
+
+Run the batch script:
+
+```cmd
+build-push-dockerhub.bat
+```
+
+Or use PowerShell directly:
+
+```powershell
+.\build-push-dockerhub.ps1
+```
+
+### Linux/macOS Users
+
+Run the shell script:
+
+```bash
+chmod +x build-push-dockerhub.sh
+./build-push-dockerhub.sh
+```
+
+### Configuration
+
+Before running the scripts, you'll need to:
+
+1. Have a Docker Hub account
+2. Log in to Docker Hub using `docker login`
+3. Either:
+   - Set your Docker Hub username in the script file
+   - Or provide it when prompted
+
+### Publishing Options
+
+The scripts allow you to:
+- Publish both the full and minimal variants of the image
+- Choose a specific version tag
+- Push to your own Docker Hub namespace
+
+After publishing, you can pull your image using:
+
+```bash
+docker pull your-username/kali-dockerized:latest
+```
+
 ## Troubleshooting
 
 ### GPG Key Issues

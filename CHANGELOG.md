@@ -34,6 +34,13 @@
 - Updated README.md with troubleshooting information
 - Added detailed usage information for all scripts
 
+### 7. Docker Hub Publishing Support
+- Added `build-push-dockerhub.sh` - Bash script for Linux/macOS users
+- Added `build-push-dockerhub.ps1` - PowerShell script for Windows users
+- Added `build-push-dockerhub.bat` - Simplified batch wrapper for Windows
+- Documented Docker Hub publishing process in README.md
+- Added configuration options for username, version tags, and image variants
+
 ## Usage Guide
 
 ### Quick Start (Windows)
