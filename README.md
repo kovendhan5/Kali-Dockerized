@@ -2,6 +2,16 @@
 
 This repository contains a Dockerfile to build and run a Kali Linux container with a graphical user interface (GUI) accessible via Remote Desktop Protocol (RDP).
 
+## Recent Fixes
+
+**Version 2.0 Updates:**
+- Fixed XRDP startup issues and PID file conflicts
+- Improved service monitoring and auto-restart functionality
+- Enhanced container lifecycle management
+- Better error handling and logging
+- Support for both `kali` and `testuser` accounts
+- Added health checks and service monitoring
+
 ## Overview
 
 This Docker setup provides:
@@ -9,6 +19,8 @@ This Docker setup provides:
 - Kali Linux with XFCE desktop environment
 - RDP access via port 3389
 - A preconfigured user account for easy access
+- Automatic service recovery and monitoring
+- Enhanced stability and error handling
 
 ## Prerequisites
 
@@ -234,3 +246,15 @@ For better performance:
 - This container runs with root privileges by default
 - For security in production environments, consider modifying the setup to run with reduced privileges
 - The container does not persist data by default; use Docker volumes if you need to save your work
+
+### Logs and Debugging
+
+View container logs:
+```bash
+docker logs kali-rdp
+```
+
+Connect to container shell:
+```bash
+docker exec -it kali-rdp bash
+```
