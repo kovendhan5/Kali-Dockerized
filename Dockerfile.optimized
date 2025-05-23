@@ -1,0 +1,62 @@
+FROM kalilinux/kali-rolling:latest AS builder
+
+# Fix GPG key issues using dedicated script
+COPY fix-gpg-keys.sh /tmp/
+RUN chmod +x /tmp/fix-gpg-keys.sh && /tmp/fix-gpg-keys.sh
+
+# Install essential packages in a single layer to reduce image size
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get install -y --no-install-recommends \
+        kali-desktop-xfce \
+        xrdp \
+        dbus-x11 \
+        supervisor \
+        sudo \
+        wget \
+        curl \
+        nmap \
+        metasploit-framework \
+        burpsuite \
+        wireshark \
+        hydra \
+        nikto \
+        sqlmap \
+        dirb \
+        net-tools \
+        iputils-ping \
+        firefox-esr && \
+    # Clean up to reduce image size
+    apt-get clean && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    # Remove documentation to save space
+    rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/info/* && \
+    # Add user to xrdp certificate group
+    adduser xrdp ssl-cert
+
+# Create a user for RDP access
+RUN useradd -m testuser && \
+    echo "testuser:1234" | chpasswd && \
+    usermod -aG sudo testuser
+
+# Copy the XRDP startup script
+COPY start-xrdp.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/start-xrdp.sh
+
+# Configure system for RDP
+RUN echo "session optional pam_systemd.so" >> /etc/pam.d/xrdp-sesman && \
+    mkdir -p /var/run/dbus && \
+    mkdir -p /var/run/xrdp && \
+    # Create dbus user if it doesn't exist
+    getent group messagebus >/dev/null || groupadd -r messagebus && \
+    getent passwd messagebus >/dev/null || useradd -r -g messagebus -d /var/run/dbus -s /sbin/nologin -c "D-Bus Message Daemon" messagebus && \
+    chown messagebus:messagebus /var/run/dbus
+
+# Expose RDP port
+EXPOSE 3389
+
+# Start XRDP service when container launches
+ENTRYPOINT ["/usr/local/bin/start-xrdp.sh"]
+
+# Default command
+CMD ["bash"]

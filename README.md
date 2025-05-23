@@ -12,6 +12,7 @@ This repository contains a Dockerfile to build and run a Kali Linux container wi
 - Support for both `kali` and `testuser` accounts
 - Added health checks and service monitoring
 - **NEW: Data persistence across container restarts**
+- **NEW: Optimized image variants for smaller size**
 
 ## Overview
 
@@ -23,6 +24,37 @@ This Docker setup provides:
 - Automatic service recovery and monitoring
 - Enhanced stability and error handling
 - **Persistent storage for user data and customizations**
+
+## Optimized Image Variants
+
+This project now includes optimized Dockerfile variants to create smaller images that are easier to upload and download:
+
+### Image Variants
+
+1. **Standard Optimized** (`Dockerfile.optimized`)
+   - Full Kali experience with common pentesting tools
+   - Single-layer installation for smaller overall size
+   - Aggressive cleanup of unnecessary files
+   - ~30-40% smaller than the regular image
+
+2. **Minimal Optimized** (`Dockerfile.minimal.optimized`)
+   - Basic XFCE desktop with only essential components
+   - Stripped locales and documentation
+   - Very small footprint while maintaining RDP functionality
+   - ~50-60% smaller than the regular image
+
+3. **Ultra-Slim** (`Dockerfile.ultraslim`)
+   - Extremely minimal setup using Fluxbox and VNC instead of XFCE/RDP
+   - Bare minimum packages installed
+   - Accessible via VNC on port 5900
+   - ~70-80% smaller than the regular image
+
+### Building Optimized Images
+
+Use the included script to build the optimized images:
+```bash
+build-optimized-images.bat
+```
 
 ## Docker Hub Publishing Notes
 

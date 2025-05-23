@@ -1,0 +1,46 @@
+FROM kalilinux/kali-rolling:latest
+
+# Fix GPG key issues using dedicated script
+COPY fix-gpg-keys.sh /tmp/
+RUN chmod +x /tmp/fix-gpg-keys.sh && /tmp/fix-gpg-keys.sh
+
+# Install super minimal GUI requirements
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get install -y --no-install-recommends \
+        xvfb \
+        x11vnc \
+        fluxbox \
+        dbus \
+        dbus-x11 \
+        sudo \
+        net-tools && \
+    # Ultra aggressive cleanup
+    apt-get clean && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/info/* && \
+    cd /usr/share/locale && \
+    ls | grep -v "en_US" | xargs rm -rf && \
+    # Remove any caches
+    find /var/cache -type f -exec rm -rf {} \; || true
+
+# Create a user
+RUN useradd -m testuser && \
+    echo "testuser:1234" | chpasswd && \
+    usermod -aG sudo testuser
+
+# Create a simple startup script for VNC
+RUN echo '#!/bin/bash\nXvfb :1 -screen 0 1024x768x16 &\nexport DISPLAY=:1\nfluxbox &\nx11vnc -display :1 -forever -usepw -create' > /usr/local/bin/start-vnc.sh && \
+    chmod +x /usr/local/bin/start-vnc.sh && \
+    mkdir -p /home/testuser/.vnc && \
+    x11vnc -storepasswd 1234 /home/testuser/.vnc/passwd && \
+    chown -R testuser:testuser /home/testuser/.vnc
+
+# Expose VNC port
+EXPOSE 5900
+
+# Start VNC service when container launches
+ENTRYPOINT ["/usr/local/bin/start-vnc.sh"]
+
+# Default command
+CMD ["bash"]
