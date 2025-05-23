@@ -125,6 +125,24 @@ echo Stopping any existing container...
 docker stop %CONTAINER_NAME% >nul 2>&1
 docker rm %CONTAINER_NAME% >nul 2>&1
 
+REM Check for port conflicts
+netstat -an | findstr "0.0.0.0:%PORT%" > nul
+if %errorlevel% equ 0 (
+    echo.
+    echo ERROR: Port %PORT% is already in use!
+    echo This may be due to:
+    echo  - Windows Remote Desktop service using port 3389
+    echo  - Another Docker container mapping to this port
+    echo  - Other services running on this port
+    echo.
+    echo Please try:
+    echo  1. Using a different port (run-kali.bat --port 3390)
+    echo  2. Stopping services that use port %PORT%
+    echo.
+    pause
+    exit /b 1
+)
+
 echo Starting Kali Linux container...
 echo Container will be available on RDP port %PORT%
 echo Default credentials: kali/testuser : 1234
@@ -141,7 +159,10 @@ if %errorlevel% eq 0 (
     echo.
     echo Connect to localhost:%PORT% using RDP client
 ) else (
+    echo.
     echo Failed to start container!
+    echo Error details:
+    docker logs %CONTAINER_NAME% 2>nul
     pause
     exit /b 1
 )
