@@ -15,6 +15,7 @@ This repository contains a Dockerfile to build and run a Kali Linux container wi
 - **NEW: Optimized image variants for smaller size**
 - **NEW: Docker Hub publishing with size-optimized images**
 - **NEW: Ultra-slim VNC-based variant for minimal size**
+- **NEW: GitHub Packages support for all image variants**
 
 ## Overview
 
@@ -26,6 +27,61 @@ This Docker setup provides:
 - Automatic service recovery and monitoring
 - Enhanced stability and error handling
 - **Persistent storage for user data and customizations**
+
+## Docker Hub & GitHub Packages
+
+### Available Images
+
+Pre-built images are available on both Docker Hub and GitHub Packages:
+
+#### Docker Hub
+
+```bash
+# Pull the standard image
+docker pull kovendhan5/kali-dockerized:latest
+
+# Pull the minimal image
+docker pull kovendhan5/kali-dockerized:minimal
+
+# Pull the minimal-optimized image (recommended)
+docker pull kovendhan5/kali-dockerized:minimal-optimized
+
+# Pull the ultra-slim image (smallest)
+docker pull kovendhan5/kali-dockerized:ultraslim
+```
+
+#### GitHub Packages
+
+```bash
+# Pull the minimal-optimized image
+docker pull ghcr.io/kovendhan5/kali-dockerized:minimal-optimized
+
+# Pull the ultra-slim image
+docker pull ghcr.io/kovendhan5/kali-dockerized:ultraslim
+```
+
+### Recommended Images
+
+- **For Full Features**: Use `kovendhan5/kali-dockerized:latest`
+- **For Balanced Setup**: Use `kovendhan5/kali-dockerized:minimal-optimized`
+- **For Minimal Size**: Use `kovendhan5/kali-dockerized:ultraslim`
+
+### Publishing Your Own Images
+
+To publish your own customized images:
+
+1. To Docker Hub:
+   ```
+   push-minimal-optimized.bat
+   push-ultraslim.bat
+   ```
+
+2. To GitHub Packages:
+   ```
+   push-to-github-packages.bat
+   ```
+
+See [DOCKER_HUB_NOTES.md](DOCKER_HUB_NOTES.md) for detailed information about publishing.
 
 ## Optimized Image Variants
 
@@ -59,40 +115,6 @@ build-optimized-images.bat
 ```
 
 For more details on image variants, see [IMAGE_VARIANTS.md](IMAGE_VARIANTS.md).
-
-## Docker Hub Publishing
-
-### Images Available on Docker Hub
-
-Pre-built images are available on Docker Hub:
-
-```bash
-# Pull the standard image
-docker pull kovendhan5/kali-dockerized:latest
-
-# Pull the minimal image
-docker pull kovendhan5/kali-dockerized:minimal
-
-# Pull the ultra-slim image (smallest)
-docker pull kovendhan5/kali-dockerized:ultraslim
-```
-
-### Publishing Your Own Images
-
-To publish your own customized images:
-
-1. For small optimized images:
-   ```
-   build-optimized-images.bat
-   push-optimized-images.bat
-   ```
-
-2. For handling large image uploads:
-   ```
-   push-large-images.bat
-   ```
-
-See [DOCKER_HUB_NOTES.md](DOCKER_HUB_NOTES.md) for detailed information about Docker Hub publishing.
 
 ## Data Persistence
 

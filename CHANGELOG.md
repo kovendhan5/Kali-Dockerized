@@ -54,6 +54,13 @@
 - Created `check-image-sizes.bat` - Tool for comparing image sizes and selecting the best one
 - Updated documentation with complete details about all image variants
 
+### 9. GitHub Packages Integration
+- Added support for publishing images to GitHub Packages
+- Created `push-to-github-packages.bat` - Script to push images to GitHub Container Registry
+- Published optimized images to both Docker Hub and GitHub Packages
+- Added documentation for pulling images from GitHub Packages
+- Updated README with GitHub Packages instructions
+
 ## Usage Guide
 
 ### Quick Start (Windows)
