@@ -1,0 +1,41 @@
+# Logs
+*.log
+logs/
+push_log.txt
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker
+.docker/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Backup files
+*.bak
+*.backup
+
+# Personal scripts (if any)
+personal/
+local/
+
+# Environment files
+.env
+.env.local
+
+# Build artifacts
+build/
+dist/

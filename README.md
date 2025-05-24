@@ -1,21 +1,48 @@
 # Kali Linux in Docker with GUI
 
-This repository contains a Dockerfile to build and run a Kali Linux container with a graphical user interface (GUI) accessible via Remote Desktop Protocol (RDP).
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-kovendhan5%2Fkali--dockerized-blue?logo=docker)](https://hub.docker.com/r/kovendhan5/kali-dockerized)
+[![GitHub Packages](https://img.shields.io/badge/GitHub%20Packages-ghcr.io-green?logo=github)](https://github.com/kovendhan5/kali-dockerized/pkgs/container/kali-dockerized)
+[![Size](https://img.shields.io/badge/Size-471MB%20to%204.47GB-orange)](#image-sizes)
 
-## Recent Fixes
+This repository contains optimized Dockerfiles to build and run Kali Linux containers with graphical user interfaces accessible via RDP or VNC.
 
-**Version 3.0 Updates:**
-- Fixed XRDP startup issues and PID file conflicts
-- Improved service monitoring and auto-restart functionality
-- Enhanced container lifecycle management
-- Better error handling and logging
-- Support for both `kali` and `testuser` accounts
-- Added health checks and service monitoring
-- **NEW: Data persistence across container restarts**
-- **NEW: Optimized image variants for smaller size**
-- **NEW: Docker Hub publishing with size-optimized images**
-- **NEW: Ultra-slim VNC-based variant for minimal size**
-- **NEW: GitHub Packages support for all image variants**
+## 📋 Table of Contents
+
+- [🚀 Quick Start](#quick-start)
+- [📦 Available Images](#available-images)
+- [📊 Image Sizes](#image-sizes)
+- [🔧 Building Locally](#building-locally)
+- [🏃 Running Containers](#running-containers)
+- [📁 Repository Structure](#repository-structure)
+- [📖 Documentation](#documentation)
+- [🔗 Links](#links)
+
+## 🚀 Quick Start
+
+Get started immediately with pre-built images:
+
+```bash
+# Smallest size (recommended for most users)
+docker run -it -p 3389:3389 --name kali-minimal kovendhan5/kali-dockerized:minimal-optimized
+
+# Ultra-minimal VNC version
+docker run -it -p 5900:5900 --name kali-vnc kovendhan5/kali-dockerized:ultraslim
+
+# Full featured version
+docker run -it -p 3389:3389 --name kali-full kovendhan5/kali-dockerized:latest-optimized
+```
+
+**Windows users**: Use `scripts\run\kali-quickstart.bat` for one-click setup!
+
+## Recent Updates
+
+**Version 3.0 - May 2025:**
+- ✅ **Optimized image variants** - Up to 75% size reduction
+- ✅ **Docker Hub publishing** - All variants available
+- ✅ **GitHub Packages** - Alternative registry support  
+- ✅ **Data persistence** - Automatic volume management
+- ✅ **Enhanced scripts** - Better automation and error handling
+- ✅ **Organized structure** - Clean directory organization
 
 ## Overview
 
@@ -28,156 +55,123 @@ This Docker setup provides:
 - Enhanced stability and error handling
 - **Persistent storage for user data and customizations**
 
-## Docker Hub & GitHub Packages
+## 📦 Available Images
 
-### Available Images
-
-Pre-built images are available on both Docker Hub and GitHub Packages:
-
-#### Docker Hub
+### 🐳 Docker Hub
 
 ```bash
-# Pull the standard image
-docker pull kovendhan5/kali-dockerized:latest
-
-# Pull the minimal image
-docker pull kovendhan5/kali-dockerized:minimal
-
-# Pull the minimal-optimized image (recommended)
+# Recommended for most users (471MB)
 docker pull kovendhan5/kali-dockerized:minimal-optimized
 
-# Pull the ultra-slim image (smallest)
+# Smallest possible size (539MB, VNC-based)
 docker pull kovendhan5/kali-dockerized:ultraslim
+
+# Full-featured optimized (4.47GB)
+docker pull kovendhan5/kali-dockerized:latest-optimized
+
+# Legacy minimal version (1.71GB)
+docker pull kovendhan5/kali-dockerized:minimal
 ```
 
-#### GitHub Packages
+### 📦 GitHub Packages
 
 ```bash
-# Pull the minimal-optimized image
+# Pull from GitHub Container Registry
 docker pull ghcr.io/kovendhan5/kali-dockerized:minimal-optimized
-
-# Pull the ultra-slim image
 docker pull ghcr.io/kovendhan5/kali-dockerized:ultraslim
 ```
 
-### Image Sizes
+## 📊 Image Sizes
 
-Comparison of available image sizes:
+Comparison of all available image variants:
 
-#### Docker Hub Images
-```
-REPOSITORY                     TAG                SIZE
-kovendhan5/kali-dockerized     latest-optimized   4.47GB
-kovendhan5/kali-dockerized     minimal            1.71GB
-kovendhan5/kali-dockerized     minimal-optimized  471MB
-kovendhan5/kali-dockerized     ultraslim          539MB
-```
+| Repository | Tag | Size | Description |
+|------------|-----|------|-------------|
+| 🟢 `kovendhan5/kali-dockerized` | `minimal-optimized` | **471MB** | **Recommended** - Best balance of features and size |
+| 🔵 `kovendhan5/kali-dockerized` | `ultraslim` | **539MB** | Smallest - VNC-based minimal setup |
+| 🟡 `kovendhan5/kali-dockerized` | `minimal` | **1.71GB** | Legacy minimal version |
+| 🟠 `kovendhan5/kali-dockerized` | `latest-optimized` | **4.47GB** | Full-featured optimized |
 
-#### GitHub Packages
-```
-REPOSITORY                           TAG                SIZE
-ghcr.io/kovendhan5/kali-dockerized   ultraslim          539MB
-ghcr.io/kovendhan5/kali-dockerized   minimal-optimized  471MB
-```
+### GitHub Packages
+| Repository | Tag | Size |
+|------------|-----|------|
+| `ghcr.io/kovendhan5/kali-dockerized` | `minimal-optimized` | **471MB** |
+| `ghcr.io/kovendhan5/kali-dockerized` | `ultraslim` | **539MB** |
 
-### Recommended Images
+**💡 Recommendation**: Use `minimal-optimized` for the best experience with minimal download time.
 
-- **For Full Features**: Use `kovendhan5/kali-dockerized:latest`
-- **For Balanced Setup**: Use `kovendhan5/kali-dockerized:minimal-optimized`
-- **For Minimal Size**: Use `kovendhan5/kali-dockerized:ultraslim`
+## 🔧 Building Locally
 
-### Publishing Your Own Images
-
-To publish your own customized images:
-
-1. To Docker Hub:
-   ```
-   push-minimal-optimized.bat
-   push-ultraslim.bat
-   ```
-
-2. To GitHub Packages:
-   ```
-   push-to-github-packages.bat
-   ```
-
-See [DOCKER_HUB_NOTES.md](DOCKER_HUB_NOTES.md) for detailed information about publishing.
-
-## Optimized Image Variants
-
-This project now includes optimized Dockerfile variants to create smaller images that are easier to upload and download:
-
-### Image Variants
-
-1. **Standard Optimized** (`Dockerfile.optimized`)
-   - Full Kali experience with common pentesting tools
-   - Single-layer installation for smaller overall size
-   - Aggressive cleanup of unnecessary files
-   - ~30-40% smaller than the regular image
-
-2. **Minimal Optimized** (`Dockerfile.minimal.optimized`)
-   - Basic XFCE desktop with only essential components
-   - Stripped locales and documentation
-   - Very small footprint while maintaining RDP functionality
-   - ~50-60% smaller than the regular image
-
-3. **Ultra-Slim** (`Dockerfile.ultraslim`)
-   - Extremely minimal setup using Fluxbox and VNC instead of XFCE/RDP
-   - Bare minimum packages installed
-   - Accessible via VNC on port 5900
-   - ~70-80% smaller than the regular image
-
-### Building Optimized Images
-
-Use the included script to build the optimized images:
+### Quick Build
 ```bash
-build-optimized-images.bat
+# Build standard image
+docker build -f dockerfiles/Dockerfile -t kali .
+
+# Build optimized variants
+scripts\build\build-optimized-images.bat
 ```
 
-For more details on image variants, see [IMAGE_VARIANTS.md](IMAGE_VARIANTS.md).
+### Available Dockerfiles
+- `dockerfiles/Dockerfile` - Standard full image
+- `dockerfiles/Dockerfile.minimal.optimized` - **Recommended** optimized minimal
+- `dockerfiles/Dockerfile.ultraslim` - Ultra-minimal VNC-based
+- `dockerfiles/Dockerfile.optimized` - Optimized full-featured
 
-## Data Persistence
+## 🏃 Running Containers
 
-All user data is automatically preserved between container restarts using Docker volumes:
-
-- User files and customizations are stored in a Docker volume
-- Container restarts maintain all your data and settings
-- No need for manual backups between sessions
-
-For more details, see [DATA_PERSISTENCE.md](DATA_PERSISTENCE.md).
-
-## Prerequisites
-
-- Docker installed on your host system
-- RDP client (like Microsoft Remote Desktop)
-
-## Using the Pre-built Image from GitHub Container Registry
-
-This Docker image is also available as a pre-built package on GitHub Container Registry.
-
-### Pulling the Image
-
+### Quick Start Scripts
 ```bash
-# Pull the latest version
-docker pull ghcr.io/kovendhan5/kali-dockerized:latest
+# Windows one-click start
+scripts\run\kali-quickstart.bat
 
-# Or pull a specific version
-docker pull ghcr.io/kovendhan5/kali-dockerized:1.0.0
+# Advanced PowerShell runner
+scripts\run\run-kali-container.ps1
+
+# Run from Docker Hub
+scripts\run\run-from-dockerhub.ps1
 ```
 
-### Running the Pre-built Image
-
+### Manual Docker Commands
 ```bash
-docker run -it -p 3389:3389 --name kali-rdp ghcr.io/kovendhan5/kali-dockerized:latest
+# RDP access (recommended)
+docker run -it -p 3389:3389 --name kali kovendhan5/kali-dockerized:minimal-optimized
+
+# VNC access (ultra-slim)
+docker run -it -p 5900:5900 --name kali-vnc kovendhan5/kali-dockerized:ultraslim
+
+# With data persistence
+docker run -it -p 3389:3389 -v kali-data:/home/testuser --name kali kovendhan5/kali-dockerized:minimal-optimized
 ```
 
-## Building the Docker Image Locally
+**Connection Details:**
+- **RDP**: `localhost:3389` (Username: `testuser`, Password: `1234`)
+- **VNC**: `localhost:5900` (Password: `kali`)
 
-To build the Kali Linux Docker image, run the following command in the repository directory:
+## 📁 Repository Structure
 
-```bash
-docker build -t kali .
 ```
+📦 kali-dockerized/
+├── 📄 README.md                    # Main documentation
+├── 📄 DIRECTORY_STRUCTURE.md       # This organization guide
+├── 📁 dockerfiles/                 # All Dockerfile variants
+│   ├── 📄 Dockerfile               # Standard full image
+│   ├── 📄 Dockerfile.minimal       # Legacy minimal
+│   ├── 📄 Dockerfile.minimal.optimized  # ⭐ Recommended
+│   ├── 📄 Dockerfile.optimized     # Optimized full
+│   └── 📄 Dockerfile.ultraslim     # VNC ultra-minimal
+├── 📁 scripts/
+│   ├── 📁 build/                   # Build automation
+│   ├── 📁 push/                    # Registry publishing
+│   ├── 📁 run/                     # Container execution
+│   └── 📁 utils/                   # Maintenance tools
+└── 📁 docs/                        # Documentation
+    ├── 📄 CHANGELOG.md             # Version history
+    ├── 📄 IMAGE_VARIANTS.md        # Detailed comparisons
+    ├── 📄 DATA_PERSISTENCE.md      # Persistence guide
+    └── 📄 DOCKER_HUB_NOTES.md      # Publishing guide
+```
+
+See [`DIRECTORY_STRUCTURE.md`](DIRECTORY_STRUCTURE.md) for detailed organization information.
 
 Example build output:
 
@@ -439,4 +433,31 @@ For better performance:
 
 - This container runs with root privileges by default
 - For security in production environments, consider modifying the setup to run with reduced privileges
-- The container does not persist data by default; use Docker volumes if you need to save your work
+- Use Docker volumes for data persistence
+
+## 📖 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [`docs/IMAGE_VARIANTS.md`](docs/IMAGE_VARIANTS.md) | Detailed comparison of all image variants |
+| [`docs/DATA_PERSISTENCE.md`](docs/DATA_PERSISTENCE.md) | Guide to data persistence and volumes |
+| [`docs/DOCKER_HUB_NOTES.md`](docs/DOCKER_HUB_NOTES.md) | Publishing and registry information |
+| [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Version history and updates |
+| [`DIRECTORY_STRUCTURE.md`](DIRECTORY_STRUCTURE.md) | Repository organization guide |
+
+## 🔗 Links
+
+- **🐳 Docker Hub**: [kovendhan5/kali-dockerized](https://hub.docker.com/r/kovendhan5/kali-dockerized)
+- **📦 GitHub Packages**: [ghcr.io/kovendhan5/kali-dockerized](https://github.com/kovendhan5/kali-dockerized/pkgs/container/kali-dockerized)
+- **📋 Issues**: [Report issues](https://github.com/kovendhan5/kali-dockerized/issues)
+- **🤝 Contributing**: [Contribution guidelines](https://github.com/kovendhan5/kali-dockerized/blob/main/CONTRIBUTING.md)
+
+## 📄 License
+
+This project is open source. See the repository for license details.
+
+---
+
+⭐ **Star this repository** if you find it useful!
+
+**💡 Need help?** Check the [documentation](docs/) or [open an issue](https://github.com/kovendhan5/kali-dockerized/issues).
