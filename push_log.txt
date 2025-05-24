@@ -1,0 +1,45 @@
+24-05-2025 12:45:09.72 
+Checking Docker login status... 
+Pushing ultra-slim image... 
+The push refers to repository [docker.io/kovendhan5/kali-dockerized]
+c9c868d1b65e: Preparing
+7ee07441ec72: Preparing
+e5916de4edde: Preparing
+c529f5fa3943: Preparing
+2a1375607bde: Preparing
+47a95d5e995b: Preparing
+47a95d5e995b: Waiting
+7ee07441ec72: Pushed
+c9c868d1b65e: Pushed
+2a1375607bde: Pushed
+c529f5fa3943: Pushed
+47a95d5e995b: Pushed
+e5916de4edde: Pushed
+ultraslim: digest: sha256:8cd18be343deabf2bc77d349ffa7d8d70171ccfc366c93475b3548b23f0605c7 size: 1576
+Ultra-slim image pushed successfully! 
+ 
+Pushing minimal-optimized image... 
+The push refers to repository [docker.io/kovendhan5/kali-dockerized]
+c809aed2d9ad: Preparing
+6d42164a7eb8: Preparing
+8c641b1fe5cd: Preparing
+934a4bdab7f0: Preparing
+28b51e124ffc: Preparing
+c529f5fa3943: Preparing
+2a1375607bde: Preparing
+47a95d5e995b: Preparing
+2a1375607bde: Waiting
+c529f5fa3943: Waiting
+47a95d5e995b: Waiting
+8c641b1fe5cd: Pushed
+934a4bdab7f0: Pushed
+c809aed2d9ad: Pushed
+6d42164a7eb8: Pushed
+2a1375607bde: Layer already exists
+c529f5fa3943: Layer already exists
+28b51e124ffc: Pushed
+47a95d5e995b: Pushed
+minimal-optimized: digest: sha256:b47a469f010b9c83920a8cffce30a49dd9088e0a78c02a5d693effcb2cd94e80 size: 1991
+Minimal-optimized image pushed successfully! 
+ 
+Process completed at 24-05-2025 12:48:38.91 

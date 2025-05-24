@@ -4,7 +4,7 @@ This repository contains a Dockerfile to build and run a Kali Linux container wi
 
 ## Recent Fixes
 
-**Version 2.0 Updates:**
+**Version 3.0 Updates:**
 - Fixed XRDP startup issues and PID file conflicts
 - Improved service monitoring and auto-restart functionality
 - Enhanced container lifecycle management
@@ -13,6 +13,8 @@ This repository contains a Dockerfile to build and run a Kali Linux container wi
 - Added health checks and service monitoring
 - **NEW: Data persistence across container restarts**
 - **NEW: Optimized image variants for smaller size**
+- **NEW: Docker Hub publishing with size-optimized images**
+- **NEW: Ultra-slim VNC-based variant for minimal size**
 
 ## Overview
 
@@ -56,29 +58,41 @@ Use the included script to build the optimized images:
 build-optimized-images.bat
 ```
 
-## Docker Hub Publishing Notes
+For more details on image variants, see [IMAGE_VARIANTS.md](IMAGE_VARIANTS.md).
 
-### Large Image Size Considerations
+## Docker Hub Publishing
 
-The Kali Linux Docker images are quite large due to the included packages and desktop environment:
-- Full image: ~2.5-3GB
-- Minimal image: ~1-1.5GB
+### Images Available on Docker Hub
 
-When pushing to Docker Hub, you might encounter timeout issues or interrupted uploads due to the large size. If this happens:
+Pre-built images are available on Docker Hub:
 
-1. Use the provided `push-large-images.bat` script which includes retry logic
-2. Try pushing the minimal image first using `push-minimal-image.bat`
-3. For manual retries, use this command:
-   ```bash
-   docker push YOUR_USERNAME/kali-dockerized:TAG --disable-content-trust
+```bash
+# Pull the standard image
+docker pull kovendhan5/kali-dockerized:latest
+
+# Pull the minimal image
+docker pull kovendhan5/kali-dockerized:minimal
+
+# Pull the ultra-slim image (smallest)
+docker pull kovendhan5/kali-dockerized:ultraslim
+```
+
+### Publishing Your Own Images
+
+To publish your own customized images:
+
+1. For small optimized images:
    ```
-4. Make sure you have a stable internet connection before pushing
+   build-optimized-images.bat
+   push-optimized-images.bat
+   ```
 
-### Docker Hub Command Options
+2. For handling large image uploads:
+   ```
+   push-large-images.bat
+   ```
 
-For large images, using these Docker command options can help:
-- `--disable-content-trust`: Can help with large image uploads
-- Consider breaking large uploads into smaller layers in your Dockerfile
+See [DOCKER_HUB_NOTES.md](DOCKER_HUB_NOTES.md) for detailed information about Docker Hub publishing.
 
 ## Data Persistence
 

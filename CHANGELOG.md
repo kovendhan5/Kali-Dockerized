@@ -40,9 +40,19 @@
 - Added `build-push-dockerhub.bat` - Simplified batch wrapper for Windows
 - Added `push-large-images.bat` - Special script for handling large image uploads
 - Added `push-minimal-image.bat` - Script focused on pushing just the minimal image
+- Added `push-direct.bat` - Direct push script with logging for troubleshooting
 - Enhanced retry logic for dealing with large Docker image uploads
 - Documented Docker Hub publishing process in README.md
 - Added configuration options for username, version tags, and image variants
+
+### 8. Optimized Image Variants
+- Added `Dockerfile.optimized` - Streamlined version of the full image with ~30-40% size reduction
+- Added `Dockerfile.minimal.optimized` - Ultra-lean XFCE desktop with ~50-60% size reduction
+- Added `Dockerfile.ultraslim` - Extremely minimal VNC-based image with ~70-80% size reduction
+- Created `build-optimized-images.bat` - Script to easily build optimized variants
+- Created `push-optimized-images.bat` - Script to push optimized variants to Docker Hub
+- Created `check-image-sizes.bat` - Tool for comparing image sizes and selecting the best one
+- Updated documentation with complete details about all image variants
 
 ## Usage Guide
 

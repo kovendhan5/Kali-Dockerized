@@ -6,7 +6,7 @@ param(
     [string]$DockerHubUsername,
     
     [Parameter(Mandatory=$false)]
-    [ValidateSet("latest", "minimal")]
+    [ValidateSet("latest", "minimal", "latest-optimized", "minimal-optimized", "ultraslim")]
     [string]$Tag = "latest",
     
     [Parameter(Mandatory=$false)]
@@ -40,6 +40,15 @@ if ([string]::IsNullOrEmpty($DockerHubUsername)) {
     }
 } else {
     $imageName = "${DockerHubUsername}/kali-dockerized:${Tag}"
+}
+
+# Determine connection type and port based on image variant
+$isVNC = $false
+$connectPort = $Port
+if ($Tag -eq "ultraslim") {
+    $isVNC = $true
+    $connectPort = 5900
+    Write-Host "Note: Ultra-slim image uses VNC on port 5900 instead of RDP" -ForegroundColor Yellow
 }
 
 # Check if container with the same name already exists
@@ -79,7 +88,14 @@ if ($LASTEXITCODE -ne 0) {
 
 # Creating and starting the container
 Write-Host "Creating and starting container..." -ForegroundColor Cyan
-docker run -d --name $ContainerName -p "${Port}:3389" -v "${ContainerName}_home:/home" $imageName
+
+if ($isVNC) {
+    # For VNC-based container (ultraslim)
+    docker run -d --name $ContainerName -p "${connectPort}:5900" -v "${ContainerName}_home:/home" $imageName
+} else {
+    # For RDP-based container (all other variants)
+    docker run -d --name $ContainerName -p "${connectPort}:3389" -v "${ContainerName}_home:/home" $imageName
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Failed to create and start the container." -ForegroundColor Red
@@ -88,11 +104,18 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "`nContainer started successfully!" -ForegroundColor Green
 Write-Host "Container Name: $ContainerName" -ForegroundColor Green
-Write-Host "RDP Port: $Port" -ForegroundColor Green
+
+if ($isVNC) {
+    Write-Host "VNC Port: $connectPort" -ForegroundColor Green
+    Write-Host "`nYou can now connect via VNC to localhost:${connectPort}" -ForegroundColor Green
+} else {
+    Write-Host "RDP Port: $connectPort" -ForegroundColor Green
+    Write-Host "`nYou can now connect via RDP to localhost:${connectPort}" -ForegroundColor Green
+}
+
 Write-Host "Image: $imageName" -ForegroundColor Green
-Write-Host "`nYou can now connect via RDP to localhost:${Port}" -ForegroundColor Green
 Write-Host "Default credentials:" -ForegroundColor Green
-Write-Host "  Username: testuser (or kali)" -ForegroundColor Cyan
+Write-Host "  Username: testuser" -ForegroundColor Cyan
 Write-Host "  Password: 1234" -ForegroundColor Cyan
 
 # Ask if user wants to launch RDP client

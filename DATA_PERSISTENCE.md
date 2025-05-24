@@ -19,6 +19,22 @@ This document explains how user data and customizations are preserved between co
      * User is warned about potential data loss
      * Confirmation is required before deletion
 
+## Persistence in Optimized Images
+
+The optimized image variants also support data persistence:
+
+1. **Standard & Minimal Optimized Images**:
+   - Use the same RDP-based persistence mechanism as the main images
+   - Docker volume is used for the `/home` directory
+   - All user settings and files are preserved across restarts
+
+2. **Ultra-slim Image**:
+   - Uses a different mechanism due to its VNC-based setup
+   - Still preserves user files in the `/home` directory
+   - Customizations to the Fluxbox window manager are stored in the container
+   
+When switching between different image variants, note that desktop settings may not transfer, but user files in `/home` will be preserved as long as you mount the same volume.
+
 ## What Gets Preserved
 
 - All files in the user's home directory
