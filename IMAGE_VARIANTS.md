@@ -25,7 +25,7 @@ A lightweight variant with:
 - Basic XFCE desktop
 - Firefox and network utilities
 - Minimal toolset
-- Size: ~1GB
+- Size: 1.71GB
 
 Best for: Development, learning, or when disk space is limited
 
@@ -52,7 +52,7 @@ These variants are specifically designed to be smaller for easier pushing to Doc
 - Contains most of the tools from the full image
 - Aggressive cleanup to reduce size
 - Single-layer installation for efficient storage
-- Size: ~30-40% smaller than the full version
+- Size: 4.47GB
 
 ```bash
 # Build the optimized image
@@ -65,7 +65,7 @@ build-optimized-images.bat
 - Ultra-lean XFCE desktop with only essential components
 - No Firefox to reduce size significantly
 - Bare minimum packages required for a functional RDP desktop
-- Size: ~50-60% smaller than the minimal version
+- Size: 471MB
 
 ```bash
 # Build the optimized minimal image
@@ -78,7 +78,7 @@ build-optimized-images.bat
 - Extremely minimal with Fluxbox window manager instead of XFCE
 - Uses VNC instead of RDP (port 5900)
 - Minimal system tools only
-- Size: ~70-80% smaller than the full version
+- Size: 539MB
 
 ```bash
 # Build the ultra-slim image
@@ -88,7 +88,25 @@ build-optimized-images.bat
 
 # Size Comparison
 
-To compare the sizes of different image variants:
+## Actual Image Sizes
+
+Here are the actual sizes of all image variants:
+
+```
+REPOSITORY                     TAG                SIZE
+kovendhan5/kali-dockerized     latest-optimized   4.47GB
+kovendhan5/kali-dockerized     minimal            1.71GB
+kovendhan5/kali-dockerized     minimal-optimized  471MB
+kovendhan5/kali-dockerized     ultraslim          539MB
+```
+
+## Size Reduction Analysis
+
+- **Minimal Optimized**: 471MB (72% smaller than minimal 1.71GB)
+- **Ultra-Slim**: 539MB (68% smaller than minimal 1.71GB)
+- **Latest Optimized**: 4.47GB (optimized version of full image)
+
+To compare the sizes of different image variants locally:
 
 ```bash
 check-image-sizes.bat

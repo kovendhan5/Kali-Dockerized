@@ -61,6 +61,14 @@
 - Added documentation for pulling images from GitHub Packages
 - Updated README with GitHub Packages instructions
 
+### 10. Completed Image Deployments (May 24, 2025)
+- ✅ Successfully pushed `kovendhan5/kali-dockerized:ultraslim` (539MB) to Docker Hub
+- ✅ Successfully pushed `kovendhan5/kali-dockerized:minimal-optimized` (471MB) to Docker Hub
+- ✅ Successfully pushed `kovendhan5/kali-dockerized:latest-optimized` (4.47GB) to Docker Hub
+- ✅ Successfully pushed optimized images to GitHub Packages
+- ✅ Updated README.md with complete image size comparison table
+- ✅ All image variants now available on both Docker Hub and GitHub Container Registry
+
 ## Usage Guide
 
 ### Quick Start (Windows)

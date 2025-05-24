@@ -60,6 +60,26 @@ docker pull ghcr.io/kovendhan5/kali-dockerized:minimal-optimized
 docker pull ghcr.io/kovendhan5/kali-dockerized:ultraslim
 ```
 
+### Image Sizes
+
+Comparison of available image sizes:
+
+#### Docker Hub Images
+```
+REPOSITORY                     TAG                SIZE
+kovendhan5/kali-dockerized     latest-optimized   4.47GB
+kovendhan5/kali-dockerized     minimal            1.71GB
+kovendhan5/kali-dockerized     minimal-optimized  471MB
+kovendhan5/kali-dockerized     ultraslim          539MB
+```
+
+#### GitHub Packages
+```
+REPOSITORY                           TAG                SIZE
+ghcr.io/kovendhan5/kali-dockerized   ultraslim          539MB
+ghcr.io/kovendhan5/kali-dockerized   minimal-optimized  471MB
+```
+
 ### Recommended Images
 
 - **For Full Features**: Use `kovendhan5/kali-dockerized:latest`
